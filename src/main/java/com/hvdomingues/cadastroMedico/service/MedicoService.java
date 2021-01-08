@@ -1,13 +1,18 @@
 package com.hvdomingues.cadastroMedico.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hvdomingues.cadastroMedico.dao.jpa.MedicoRepository;
 import com.hvdomingues.cadastroMedico.domain.Medico;
+import com.hvdomingues.cadastroMedico.exception.DatabaseException;
+import com.hvdomingues.cadastroMedico.exception.IllegalArgumentException;
 
 @Service
 public class MedicoService {
@@ -35,29 +40,54 @@ public class MedicoService {
 			Medico medicoNovo = savedMedico.get();
 
 			if (medico.getCelular() != null) {
-				medicoNovo.setCelular(medico.getCelular());
+				
+				if(validaTelefone(medico.getCelular())) {
+					medicoNovo.setCelular(medico.getCelular());
+				}else {
+					throw new IllegalArgumentException("O celular informado está incorreto, mudança não realizada");
+				}
+				
 			} else if (medico.getEndereco() != null) {
 				medicoNovo.setEndereco(medico.getEndereco());
 			} else if (medico.getCRM() != null) {
-				medicoNovo.setCRM(medico.getCRM());
+				if(validaCrm(medico.getCRM())) {
+					medicoNovo.setCRM(medico.getCRM());
+				}else {
+					throw new IllegalArgumentException("O CRM informado deve conter apenas números e ter um máximo de 7 caracteres.");
+				}	
+				
+				
 			} else if (medico.getNomeCompleto() != null) {
-				medicoNovo.setNomeCompleto(medico.getNomeCompleto());
+				if(medico.getNomeCompleto().length() > 120) {
+					throw new IllegalArgumentException("O nome informado deve conter no máximo 120 caracteres.");
+				}else {
+					medicoNovo.setNomeCompleto(medico.getNomeCompleto());
+				}
+				
 			} else if (medico.getTelefone() != null) {
-				medicoNovo.setTelefone(medico.getTelefone());
+
+				if(validaTelefone(medico.getTelefone())) {
+					medicoNovo.setTelefone(medico.getTelefone());
+				}else {
+					throw new IllegalArgumentException("O telefone informado está incorreto, mudança não realizada");
+				}
+				
 			}
 
 			return medicoRepository.save(medicoNovo);
 
+		}else {
+			throw new IllegalArgumentException("O médico com o ID informado não foi encontrado");
+
 		}
 
-		return null;
 	}
 
 	public Boolean deleteMedicoById(Long id) {
 
 		Medico medico = getMedicoById(id).get();
-		medico.setIsDeleted(true);
-		medico = updateMedico(medico);
+		medico.setIsDeleted(true); 
+		medico = medicoRepository.save(medico);
 		return medico.getIsDeleted();
 	}
 
@@ -85,6 +115,8 @@ public class MedicoService {
 		List<Medico> foundMedicos = medicoRepository.findByCrm(crm);
 		
 		return removeDeleted(foundMedicos);
+		
+		
 	}
 
 	public List<Medico> getMedicosByNomeCompleto(String nomeCompleto) {
@@ -107,13 +139,44 @@ public class MedicoService {
 	
 	private List<Medico> removeDeleted(List<Medico> foundMedicos){
 		
-		for (Medico medico : foundMedicos) {
-			if(medico.getIsDeleted()) {
-				foundMedicos.remove(medico);
-			}
+		List<Medico> activeMedicos = new ArrayList<>();
+		
+		if(foundMedicos.size() == 0) {
+			throw new DatabaseException("Não foi encontrado nenhum médico com o critério informado.");
 		}
 		
-		return foundMedicos;
+		for (Medico medico : foundMedicos) {
+			if(!medico.getIsDeleted()) {
+				activeMedicos.add(medico);
+			}
+			
+		}
+		
+		if(activeMedicos.size() == 0) {
+			throw new DatabaseException("Não foi encontrado nenhum médico ativo com o critério informado.");
+		}
+		
+		return activeMedicos;
+	}
+	
+	private Boolean validaTelefone(String telefone) {
+		
+		Pattern telPattern = Pattern.compile("^\\(?[1-9]{2}\\)? ?(?:[2-8]|9[1-9])[0-9]{3}\\-?[0-9]{4}$");
+		Matcher matcher = telPattern.matcher(telefone);
+		
+		boolean matchFound = matcher.find();
+		
+		return matchFound;
+	}
+	
+	private Boolean validaCrm(String crm) {
+		
+		Pattern crmPattern = Pattern.compile("^[0-9]{0,6}+$");
+		Matcher matcher = crmPattern.matcher(crm);
+		
+		boolean matchFound = matcher.find();
+		
+		return matchFound;
 	}
 
 }

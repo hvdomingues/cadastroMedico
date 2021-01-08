@@ -1,6 +1,7 @@
 package com.hvdomingues.cadastroMedico.api.rest;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,19 +21,19 @@ import com.hvdomingues.cadastroMedico.domain.Medico;
 import com.hvdomingues.cadastroMedico.service.MedicoService;
 
 @RestController
-@RequestMapping(value = "/api")
+@RequestMapping(value = "/api/medico")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MedicoController {
 
 	@Autowired
-	private MedicoService service;
+	private MedicoService medicoService;
 
 	// Insert method
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	@ResponseStatus(HttpStatus.CREATED)
 	public void createMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response) {
-		Medico createdMedico = this.service.createMedico(medico);
+		Medico createdMedico = this.medicoService.createMedico(medico);
 		response.setHeader("Location", request.getRequestURL().append("/").append(createdMedico.getId()).toString());
 	}
 
@@ -41,7 +42,7 @@ public class MedicoController {
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<Iterable<Medico>> getAllMedicos() {
 
-		Iterable<Medico> medicos = service.getAllMedicos();
+		Iterable<Medico> medicos = medicoService.getAllMedicos();
 
 		return ResponseEntity.ok().body(medicos);
 
@@ -54,7 +55,7 @@ public class MedicoController {
 	public ResponseEntity<Medico> updateMedico(@RequestBody Medico medico, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		Medico updatedMedico = service.updateMedico(medico);
+		Medico updatedMedico = medicoService.updateMedico(medico);
 
 		return ResponseEntity.ok().body(updatedMedico);
 
@@ -67,20 +68,33 @@ public class MedicoController {
 	public ResponseEntity<Boolean> deleteMedico(@RequestBody Medico medico, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		Boolean isDeleted = service.deleteMedicoById(medico.getId());
+		Boolean isDeleted = medicoService.deleteMedicoById(medico.getId());
 
 		return ResponseEntity.ok().body(isDeleted);
 
 	}
 
 	// Select by value methods
+	@RequestMapping(value = "/id", method = RequestMethod.GET, consumes = { "application/json",
+			"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<Medico> getMedicoById(@RequestBody Long id,
+			HttpServletRequest request, HttpServletResponse response) {
+
+		Optional<Medico> resultado = medicoService.getMedicoById(id);
+		
+
+		return ResponseEntity.ok().body(resultado.get());
+
+	}
+
 	@RequestMapping(value = "/nomecompleto", method = RequestMethod.GET, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<List<Medico>> getMedicoByNomeCompleto(@RequestBody String nomeCompleto,
 			HttpServletRequest request, HttpServletResponse response) {
 
-		List<Medico> resultados = service.getMedicosByNomeCompleto(nomeCompleto);
+		List<Medico> resultados = medicoService.getMedicosByNomeCompleto(nomeCompleto);
 
 		return ResponseEntity.ok().body(resultados);
 
@@ -92,7 +106,7 @@ public class MedicoController {
 	public ResponseEntity<List<Medico>> getMedicoByCrm(@RequestBody String crm, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		List<Medico> resultados = service.getMedicosByCrm(crm);
+		List<Medico> resultados = medicoService.getMedicosByCrm(crm);
 
 		return ResponseEntity.ok().body(resultados);
 	}
@@ -103,7 +117,7 @@ public class MedicoController {
 	public ResponseEntity<List<Medico>> getMedicoByTelefone(@RequestBody String telefone, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		List<Medico> resultados = service.getMedicosByTelefone(telefone);
+		List<Medico> resultados = medicoService.getMedicosByTelefone(telefone);
 
 		return ResponseEntity.ok().body(resultados);
 	}
@@ -114,7 +128,7 @@ public class MedicoController {
 	public ResponseEntity<List<Medico>> getMedicoByCelular(@RequestBody String celular, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		List<Medico> resultados = service.getMedicosByCelular(celular);
+		List<Medico> resultados = medicoService.getMedicosByCelular(celular);
 
 		return ResponseEntity.ok().body(resultados);
 	}
@@ -125,7 +139,7 @@ public class MedicoController {
 	public ResponseEntity<List<Medico>> getMedicoByCep(@RequestBody String cep, HttpServletRequest request,
 			HttpServletResponse response) {
 
-		List<Medico> resultados = service.getMedicosByCep(cep);
+		List<Medico> resultados = medicoService.getMedicosByCep(cep);
 
 		return ResponseEntity.ok().body(resultados);
 	}

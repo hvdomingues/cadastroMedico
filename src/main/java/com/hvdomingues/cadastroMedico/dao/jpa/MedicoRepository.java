@@ -8,6 +8,7 @@ import com.hvdomingues.cadastroMedico.domain.Medico;
 
 public interface MedicoRepository extends PagingAndSortingRepository<Medico, Long> {
 	
+	
 	List<Medico> findByCrm(String crm);
 	List<Medico> findByTelefone(String telefone);
 	List<Medico> findByCelular(String celular);
