@@ -17,7 +17,7 @@ public class Especialidade implements Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
+	@Column(name = "especialidade_id")
 	private Long id;
 	
 	@Column(name = "nome_especialidade")

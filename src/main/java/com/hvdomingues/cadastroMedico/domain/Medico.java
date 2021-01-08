@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -24,28 +25,31 @@ public class Medico implements Serializable {
 
 	@Column(name = "telefone", nullable = false)
 	private String telefone;
+	
 	@Column(name = "celular", nullable = false)
 	private String celular;
-	@Column(name = "cep", nullable = false)
-	private String cep;
 
 	@Column(name = "crm", nullable = false)
 	private String crm;
 
 	@Column(name = "is_deleted")
 	private Boolean isDeleted = false;
+	
+	@OneToOne
+	private Endereco endereco;
+	
 
 	public Medico() {
 
 	}
 
-	public Medico(String nomeCompleto, String crm, String telefone, String celular, String cep) {
+	public Medico(String nomeCompleto, String crm, String telefone, String celular, Endereco endereco) {
 
 		this.nomeCompleto = nomeCompleto;
 		this.crm = crm;
 		this.telefone = telefone;
 		this.celular = celular;
-		this.cep = cep;
+
 	}
 
 	public Long getId() {
@@ -96,12 +100,14 @@ public class Medico implements Serializable {
 		this.celular = celular;
 	}
 
-	public String getCEP() {
-		return cep;
+	
+
+	public Endereco getEndereco() {
+		return endereco;
 	}
 
-	public void setCEP(String cep) {
-		this.cep = cep;
+	public void setEndereco(Endereco endereco) {
+		this.endereco = endereco;
 	}
 
 	@Override

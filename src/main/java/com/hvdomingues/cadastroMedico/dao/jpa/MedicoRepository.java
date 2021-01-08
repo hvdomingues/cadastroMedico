@@ -11,8 +11,9 @@ public interface MedicoRepository extends PagingAndSortingRepository<Medico, Lon
 	List<Medico> findByCrm(String crm);
 	List<Medico> findByTelefone(String telefone);
 	List<Medico> findByCelular(String celular);
-	List<Medico> findByNomeCompletoIgnoreCase(String nomeCompleto);
-	List<Medico> findByCep(String cep);
+	
+	List<Medico> findByNomeCompletoStartingWithIgnoreCase(String nomeCompleto);
+	
 	List<Medico> findByIsDeleted(Boolean isDeleted);
 	
 }
