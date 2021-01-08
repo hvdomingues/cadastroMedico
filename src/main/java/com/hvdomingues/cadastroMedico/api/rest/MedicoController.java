@@ -32,9 +32,11 @@ public class MedicoController {
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<Medico> createMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response) {
+		
 		Medico createdMedico = this.medicoService.createMedico(medico);
-		response.setHeader("Location", request.getRequestURL().append("/").append(createdMedico.getId()).toString());
+		
+		return ResponseEntity.ok().body(createdMedico);
 	}
 
 	// Select all method

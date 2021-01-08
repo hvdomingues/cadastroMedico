@@ -28,7 +28,18 @@ public class MedicoService {
 	}
 
 	public Medico createMedico(Medico medico) {
-		return medicoRepository.save(medico);
+		
+		Endereco novoEndereco = medico.getEndereco();
+		
+		medico.setEndereco(null);
+		
+		medico = medicoRepository.save(medico);
+		
+		medico.setEndereco(enderecoService.createEndereco(medico, novoEndereco));
+		
+		updateMedico(medico);
+		
+		return medico;
 	}
 
 	public Optional<Medico> getMedicoById(Long id) {
@@ -76,6 +87,8 @@ public class MedicoService {
 					throw new IllegalArgumentException("O telefone informado está incorreto, mudança não realizada");
 				}
 
+			} else if (medico.getEndereco() != null) {
+				medicoNovo.setEndereco(medico.getEndereco());
 			}
 
 			return medicoRepository.save(medicoNovo);
