@@ -1,5 +1,7 @@
 package com.hvdomingues.cadastroMedico.api.rest;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,7 +30,7 @@ public class MedicoController {
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	@ResponseStatus(HttpStatus.CREATED)
-	public void createHotel(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response) {
+	public void createMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response) {
 		Medico createdMedico = this.service.createMedico(medico);
 		response.setHeader("Location", request.getRequestURL().append("/").append(createdMedico.getId()).toString());
 	}
@@ -36,13 +38,49 @@ public class MedicoController {
 	
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<Iterable<Medico>> getAllMedico() {
+	public ResponseEntity<Iterable<Medico>> getAllMedicos() {
 		
 		Iterable<Medico> medicos = service.getAllMedicos();
 		
 		return ResponseEntity.ok().body(medicos);
 
 	}
+	
+	@RequestMapping(value = "", method = RequestMethod.PUT, consumes = { "application/json",
+	"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<Medico> updateMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response){
+		
+		Medico updatedMedico = service.updateMedico(medico);
+		
+		
+		return ResponseEntity.ok().body(updatedMedico);
+		
+		
+		
+	}
+	
+	@RequestMapping(value = "", method = RequestMethod.DELETE, consumes = { "application/json",
+	"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<Boolean> deleteMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response){
+		
+		Boolean isDeleted = service.deleteMedicoById(medico.getId());
+		
+		return ResponseEntity.ok().body(isDeleted);	
+		
+	}
+	
+	@RequestMapping(value = "", method = RequestMethod.GET, consumes = { "application/json",
+	"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<List<Medico>> getMedico(@RequestBody Medico medico, HttpServletRequest request, HttpServletResponse response){
+		
+		List<Medico> resultados = service.getMedicos(medico);
+		 
+		return ResponseEntity.ok().body(resultados);	
+		
+	} 
 	
 	
 
