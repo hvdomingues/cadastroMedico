@@ -1,5 +1,5 @@
-INSERT INTO medico (nome_completo, crm, telefone, celular, cep) VALUES
-  ('Aliko', '1234569', '119958645','11845454','03568999');
+INSERT INTO medico ( medico_id, nome_completo, crm, telefone, celular, cep, is_deleted) VALUES
+  (1, 'Aliko', '1234569', '119958645','11845454','03568999', 0);
 
 
 INSERT INTO especialidade (id, nome_especialidade) VALUES
@@ -12,7 +12,7 @@ INSERT INTO especialidade (id, nome_especialidade) VALUES
   (7, 'CIRURGIA CARDÍACA'),
   (8, 'CIRURGIA DE TÓRAX');
 	
-INSERT INTO MEDICO_ESPECIALIDADE ( CRM , especialidade_ID) VALUES
-	 ('1234569','2'),
-	 ('1234569','4');
+INSERT INTO MEDICO_ESPECIALIDADE ( medico_id , especialidade_ID) VALUES
+	 ('1','2'),
+	 ('1','4');
 	 

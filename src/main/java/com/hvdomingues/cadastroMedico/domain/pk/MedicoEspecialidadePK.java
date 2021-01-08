@@ -14,7 +14,7 @@ public class MedicoEspecialidadePK implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@ManyToOne
-	@JoinColumn(name = "crm")
+	@JoinColumn(name = "medico_id")
 	private Medico medico;
 	
 	@ManyToOne

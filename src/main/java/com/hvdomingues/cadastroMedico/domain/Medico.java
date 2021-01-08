@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,30 +15,53 @@ public class Medico implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name = "crm", unique = true)
-	private Integer crm;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "medico_id", unique = true)
+	private Long id;
 
 	@Column(name = "nome_completo", nullable = false)
 	private String nomeCompleto;
 
 	@Column(name = "telefone", nullable = false)
-	private Integer telefone;
+	private String telefone;
 	@Column(name = "celular", nullable = false)
-	private Integer celular;
+	private String celular;
 	@Column(name = "cep", nullable = false)
-	private Integer cep;
+	private String cep;
+
+	@Column(name = "crm", nullable = false)
+	private String crm;
+
+	@Column(name = "is_deleted")
+	private Boolean isDeleted = false;
 
 	public Medico() {
 
 	}
 
-	public Medico(String nomeCompleto, Integer crm, Integer telefone, Integer celular, Integer cep) {
+	public Medico(String nomeCompleto, String crm, String telefone, String celular, String cep) {
 
 		this.nomeCompleto = nomeCompleto;
 		this.crm = crm;
 		this.telefone = telefone;
 		this.celular = celular;
 		this.cep = cep;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Boolean getIsDeleted() {
+		return isDeleted;
+	}
+
+	public void setIsDeleted(Boolean isDeleted) {
+		this.isDeleted = isDeleted;
 	}
 
 	public String getNomeCompleto() {
@@ -47,38 +72,37 @@ public class Medico implements Serializable {
 		this.nomeCompleto = nomeCompleto;
 	}
 
-	public Integer getCRM() {
+	public String getCRM() {
 		return crm;
 	}
 
-	public void setCRM(Integer cRM) {
-		crm = cRM;
+	public void setCRM(String crm) {
+		this.crm = crm;
 	}
 
-	public Integer getTelefone() {
+	public String getTelefone() {
 		return telefone;
 	}
 
-	public void setTelefone(Integer telefone) {
+	public void setTelefone(String telefone) {
 		this.telefone = telefone;
 	}
 
-	public Integer getCelular() {
+	public String getCelular() {
 		return celular;
 	}
 
-	public void setCelular(Integer celular) {
+	public void setCelular(String celular) {
 		this.celular = celular;
 	}
 
-	public Integer getCEP() {
+	public String getCEP() {
 		return cep;
 	}
 
-	public void setCEP(Integer cEP) {
-		cep = cEP;
+	public void setCEP(String cep) {
+		this.cep = cep;
 	}
-
 
 	@Override
 	public int hashCode() {
