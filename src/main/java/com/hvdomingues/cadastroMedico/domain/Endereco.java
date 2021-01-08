@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "endereco")
 public class Endereco {
@@ -18,26 +20,27 @@ public class Endereco {
 	@Column(name = "endereco_id")
 	private Long id;
 	
-	@Column(name = "cep")
+	@Column(name = "cep", nullable = false)
 	private String cep;
 	
-	@Column(name = "estado")
+	@Column(name = "estado", nullable = false)
 	private String estado;
 	
-	@Column(name = "cidade")
+	@Column(name = "cidade", nullable = false)
 	private String cidade;
 	
-	@Column(name = "bairro")
+	@Column(name = "bairro", nullable = false)
 	private String bairro;
 	
-	@Column(name = "rua")
+	@Column(name = "rua", nullable = false)
 	private String rua;
 	
 	@Column(name = "numero")
 	private String numero;
 	
+	@JsonIgnore
 	@OneToOne
-	@JoinColumn(name = "medico_id")
+	@JoinColumn(name = "medico_id", nullable = false)
 	private Medico medico;
 	
 	public Endereco() {

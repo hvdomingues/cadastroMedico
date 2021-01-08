@@ -1,12 +1,16 @@
 package com.hvdomingues.cadastroMedico.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -36,7 +40,14 @@ public class Medico implements Serializable {
 	private Boolean isDeleted = false;
 	
 	@OneToOne
+	@JoinColumn(name = "medico_id")
 	private Endereco endereco;
+	
+	@ManyToMany
+	@JoinTable(name = "medico_especialidade",
+			joinColumns = @JoinColumn(name = "medico_id"),
+			inverseJoinColumns = @JoinColumn(name = "especialidade_id"))
+	private List<Especialidade> especialidades;
 	
 
 	public Medico() {
@@ -108,6 +119,16 @@ public class Medico implements Serializable {
 
 	public void setEndereco(Endereco endereco) {
 		this.endereco = endereco;
+	}
+	
+	
+
+	public List<Especialidade> getEspecialidades() {
+		return especialidades;
+	}
+
+	public void setEspecialidades(List<Especialidade> especialidades) {
+		this.especialidades = especialidades;
 	}
 
 	@Override

@@ -78,11 +78,10 @@ public class MedicoController {
 	@RequestMapping(value = "/id", method = RequestMethod.GET, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	@ResponseStatus(HttpStatus.OK)
-	public ResponseEntity<Medico> getMedicoById(@RequestBody Long id,
-			HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<Medico> getMedicoById(@RequestBody Long id, HttpServletRequest request,
+			HttpServletResponse response) {
 
 		Optional<Medico> resultado = medicoService.getMedicoById(id);
-		
 
 		return ResponseEntity.ok().body(resultado.get());
 
@@ -140,6 +139,50 @@ public class MedicoController {
 			HttpServletResponse response) {
 
 		List<Medico> resultados = medicoService.getMedicosByCep(cep);
+
+		return ResponseEntity.ok().body(resultados);
+	}
+
+	@RequestMapping(value = "/estado", method = RequestMethod.GET, consumes = { "application/json",
+			"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<List<Medico>> getMedicoByEstado(@RequestBody String estado, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		List<Medico> resultados = medicoService.getMedicosByEstado(estado);
+
+		return ResponseEntity.ok().body(resultados);
+	}
+
+	@RequestMapping(value = "/cidade", method = RequestMethod.GET, consumes = { "application/json",
+			"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<List<Medico>> getMedicoByCidade(@RequestBody String cidade, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		List<Medico> resultados = medicoService.getMedicosByCidade(cidade);
+
+		return ResponseEntity.ok().body(resultados);
+	}
+
+	@RequestMapping(value = "/bairro", method = RequestMethod.GET, consumes = { "application/json",
+			"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<List<Medico>> getMedicoByBairro(@RequestBody String bairro, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		List<Medico> resultados = medicoService.getMedicosByBairro(bairro);
+
+		return ResponseEntity.ok().body(resultados);
+	}
+
+	@RequestMapping(value = "/rua", method = RequestMethod.GET, consumes = { "application/json",
+			"application/xml" }, produces = { "application/json", "application/xml" })
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<List<Medico>> getMedicoByRua(@RequestBody String rua, HttpServletRequest request,
+			HttpServletResponse response) {
+
+		List<Medico> resultados = medicoService.getMedicosByRua(rua);
 
 		return ResponseEntity.ok().body(resultados);
 	}

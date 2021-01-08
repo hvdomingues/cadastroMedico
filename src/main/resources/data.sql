@@ -3,8 +3,8 @@ INSERT INTO medico ( medico_id, nome_completo, crm, telefone, celular, is_delete
   (2, 'Henrique', '12434569', '1159958645','115845454', 0),
   (3, 'Victor', '12434569', '1159958645','115845454', 1);
 
-INSERT INTO endereco (endereco_id, rua, medico_id, cep) VALUES
-  (1, 'Embiratai', 1, '03546000');
+INSERT INTO endereco (endereco_id, rua, bairro, estado, numero, cidade, medico_id, cep) VALUES
+  (1, 'Embira','Jd Cleusa', 'SP', '269', 'São Paulo', 1, '03546000');
 
 
 INSERT INTO especialidade (especialidade_id, nome_especialidade) VALUES
