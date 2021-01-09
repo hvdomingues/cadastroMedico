@@ -6,11 +6,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.stereotype.Service;
 
-import com.hvdomingues.cadastroMedico.dao.jpa.EspecialidadeRepository;
 import com.hvdomingues.cadastroMedico.dao.jpa.MedicoRepository;
+import com.hvdomingues.cadastroMedico.domain.Endereco;
 import com.hvdomingues.cadastroMedico.domain.Medico;
+import com.hvdomingues.cadastroMedico.dto.EnderecoDto;
 import com.hvdomingues.cadastroMedico.dto.MedicoDto;
 import com.hvdomingues.cadastroMedico.exception.DatabaseException;
 import com.hvdomingues.cadastroMedico.exception.IllegalArgumentException;
@@ -235,6 +239,91 @@ public class MedicoServiceImpl implements MedicoService {
 		
 		return medicoNovo;
 
+	}
+
+	@Override
+	public List<MedicoDto> findBy(MedicoDto medicoDto) {
+
+		Medico medico = new Medico();
+		Boolean isFilled = false;
+		
+		if(medicoDto.getNomeCompleto() != null && !medicoDto.getNomeCompleto().isBlank()) {
+			medico.setNomeCompleto(medicoDto.getNomeCompleto());
+			isFilled = true;
+		}
+		
+		if(medicoDto.getEndereco() != null) {
+			
+			Endereco enderecoEntity = new Endereco();
+			EnderecoDto enderecoDto = medicoDto.getEndereco();
+			
+			
+			if(enderecoDto.getCep() != null && !enderecoDto.getCep().isBlank()) {
+				enderecoEntity.setCep(enderecoDto.getCep());
+				isFilled = true;
+			}
+			
+			if(enderecoDto.getEstado() != null && !enderecoDto.getEstado().isBlank()) {
+				enderecoEntity.setEstado(enderecoDto.getEstado());
+				isFilled = true;
+			}
+			
+			if(enderecoDto.getCidade() != null && !enderecoDto.getCidade().isBlank()) {
+				enderecoEntity.setCidade(enderecoDto.getCidade());
+				isFilled = true;
+			}
+			
+			if(enderecoDto.getBairro() != null && !enderecoDto.getBairro().isBlank()) {
+				enderecoEntity.setBairro(enderecoDto.getBairro());
+				isFilled = true;
+			}
+			if(enderecoDto.getRua() != null && !enderecoDto.getRua().isBlank()) {
+				enderecoEntity.setRua(enderecoDto.getRua());
+				isFilled = true;
+			}
+			
+			medico.setEndereco(enderecoEntity);
+			
+			
+		}
+		
+		if(medicoDto.getTelefone() != null && !medicoDto.getTelefone().isBlank()) {
+			medico.setTelefone(medicoDto.getTelefone());
+			isFilled = true;
+		}
+		
+		if(medicoDto.getCelular() != null && !medicoDto.getCelular().isBlank()) {
+			medico.setCelular(medicoDto.getCelular());
+			isFilled = true;
+		}
+		
+		if(medicoDto.getCrm() != null && !medicoDto.getCrm().isBlank()) {
+			medico.setCrm(medicoDto.getCrm());
+		}
+		
+		if(isFilled) {
+			List<Medico> foundMedicos = (List<Medico>) medicoRepository.findAll(Example.of(medico, ExampleMatcher.matchingAll().withStringMatcher(StringMatcher.STARTING)
+					.withIgnoreCase()));
+			List<MedicoDto> foundMedicosDto = new ArrayList<MedicoDto>();
+			
+			if(foundMedicos.size() > 0) {
+				for (Medico medicoEntity : foundMedicos) {
+					foundMedicosDto.add(entityToDto(medicoEntity));
+				}
+				
+				return foundMedicosDto;
+			}
+			else {
+				throw new NotFoundException("Nenhum médico encontrado com os critérios dados.");
+			}
+		}
+		else {
+			throw new IllegalArgumentException("Algum campo de pesquisa deve ser preenchido");
+		}
+		
+		
+		
+		
 	}
 
 	/*

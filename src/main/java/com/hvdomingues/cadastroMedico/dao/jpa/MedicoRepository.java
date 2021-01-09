@@ -2,6 +2,7 @@ package com.hvdomingues.cadastroMedico.dao.jpa;
 
 import java.util.List;
 
+import org.springframework.data.domain.Example;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.hvdomingues.cadastroMedico.domain.Medico;
@@ -16,5 +17,7 @@ public interface MedicoRepository extends PagingAndSortingRepository<Medico, Lon
 	List<Medico> findByNomeCompletoStartingWithIgnoreCase(String nomeCompleto);
 	
 	List<Medico> findByIsDeleted(Boolean isDeleted);
+	
+	Iterable<Medico> findAll(Example<Medico> medico);
 	
 }

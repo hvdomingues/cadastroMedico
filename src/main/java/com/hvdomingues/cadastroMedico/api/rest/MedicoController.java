@@ -83,6 +83,22 @@ public class MedicoController {
 		return ResponseEntity.ok().body(resultado);
 
 	}
+	
+	@RequestMapping(value = "/findBy", method = RequestMethod.POST, consumes = { "application/json",
+	"application/xml" }, produces = { "application/json", "application/xml" })
+	public ResponseEntity<List<MedicoDto>> getMedicoBy(@RequestBody MedicoDto medicoDto)
+	{
+		
+		List<MedicoDto> medicos = medicoService.findBy(medicoDto);
+		
+		
+		return new ResponseEntity<List<MedicoDto>>(medicos, HttpStatus.FOUND);
+		
+		
+	}
+	
+	
+	
 
 	
 }

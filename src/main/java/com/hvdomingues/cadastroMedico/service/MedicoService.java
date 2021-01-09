@@ -16,6 +16,8 @@ public interface MedicoService {
 
 	MedicoDto getMedicoById(Long id);
 
+	List<MedicoDto> findBy(MedicoDto medicoDto);
+
 	
 	
 }
