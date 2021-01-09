@@ -1,12 +1,15 @@
 package com.hvdomingues.cadastroMedico.domain;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -22,6 +25,9 @@ public class Especialidade implements Serializable{
 	
 	@Column(name = "nome_especialidade")
 	private String nomeEspecialidade;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="especialidade")
+	private List<MedicoEspecialidade> especialidades;
 	
 	public Especialidade() {
 		
@@ -47,6 +53,16 @@ public class Especialidade implements Serializable{
 
 	public void setNomeEspecialidade(String nomeEspecialidade) {
 		this.nomeEspecialidade = nomeEspecialidade;
+	}
+	
+	
+
+	public List<MedicoEspecialidade> getEspecialidades() {
+		return especialidades;
+	}
+
+	public void setEspecialidades(List<MedicoEspecialidade> especialidades) {
+		this.especialidades = especialidades;
 	}
 
 	@Override

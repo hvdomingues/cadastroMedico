@@ -3,14 +3,15 @@ package com.hvdomingues.cadastroMedico.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -39,15 +40,12 @@ public class Medico implements Serializable {
 	@Column(name = "is_deleted")
 	private Boolean isDeleted = false;
 	
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL, fetch=FetchType.LAZY)
 	@JoinColumn(name = "medico_id")
 	private Endereco endereco;
 	
-	@ManyToMany
-	@JoinTable(name = "medico_especialidade",
-			joinColumns = @JoinColumn(name = "medico_id"),
-			inverseJoinColumns = @JoinColumn(name = "especialidade_id"))
-	private List<Especialidade> especialidades;
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="medico")
+	private List<MedicoEspecialidade> especialidades;
 	
 
 	public Medico() {
@@ -87,11 +85,13 @@ public class Medico implements Serializable {
 		this.nomeCompleto = nomeCompleto;
 	}
 
-	public String getCRM() {
+	
+
+	public String getCrm() {
 		return crm;
 	}
 
-	public void setCRM(String crm) {
+	public void setCrm(String crm) {
 		this.crm = crm;
 	}
 
@@ -123,11 +123,11 @@ public class Medico implements Serializable {
 	
 	
 
-	public List<Especialidade> getEspecialidades() {
+	public List<MedicoEspecialidade> getEspecialidades() {
 		return especialidades;
 	}
 
-	public void setEspecialidades(List<Especialidade> especialidades) {
+	public void setEspecialidades(List<MedicoEspecialidade> especialidades) {
 		this.especialidades = especialidades;
 	}
 

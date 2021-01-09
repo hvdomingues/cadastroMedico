@@ -9,8 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 @Entity
 @Table(name = "endereco")
 public class Endereco {
@@ -38,9 +36,8 @@ public class Endereco {
 	@Column(name = "numero")
 	private String numero;
 	
-	@JsonIgnore
 	@OneToOne
-	@JoinColumn(name = "medico_id", nullable = false)
+	@JoinColumn(name = "medico_id")
 	private Medico medico;
 	
 	public Endereco() {
