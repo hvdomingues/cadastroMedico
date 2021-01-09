@@ -91,6 +91,7 @@ public class EnderecoServiceImpl implements EnderecoService{
 		enderecoDto.setId(endereco.getId());
 		enderecoDto.setNumero(endereco.getNumero());
 		enderecoDto.setRua(endereco.getRua());
+		enderecoDto.setId(endereco.getId());
 		
 		return enderecoDto;
 	}

@@ -17,7 +17,6 @@ public class EnderecoDto {
 
 	private String numero;
 	
-	private MedicoDto medicoDto;
 	
 	public EnderecoDto() {
 	}
@@ -78,13 +77,7 @@ public class EnderecoDto {
 		this.numero = numero;
 	}
 
-	public MedicoDto getMedicoDto() {
-		return medicoDto;
-	}
 
-	public void setMedicoDto(MedicoDto medicoDto) {
-		this.medicoDto = medicoDto;
-	}
 	
 	
 	

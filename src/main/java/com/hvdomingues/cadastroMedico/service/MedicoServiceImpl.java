@@ -22,8 +22,8 @@ public class MedicoServiceImpl implements MedicoService {
 	@Autowired
 	private MedicoRepository medicoRepository;
 
-	@Autowired
-	private EspecialidadeService especialidadeService;
+	//@Autowired
+	//private EspecialidadeService especialidadeService;
 	
 	@Autowired
 	private EnderecoService enderecoService;
@@ -174,33 +174,9 @@ public class MedicoServiceImpl implements MedicoService {
 			}
 			
 			
-			/*if (medicoEntity.getEndereco() != null) {
-
-				medicoDto.setCep(medicoEntity.getEndereco().getCep());
-				medicoDto.setEstado(medicoEntity.getEndereco().getEstado());
-				medicoDto.setCidade(medicoEntity.getEndereco().getCidade());
-				medicoDto.setBairro(medicoEntity.getEndereco().getBairro());
-				medicoDto.setRua(medicoEntity.getEndereco().getRua());
-				medicoDto.setNumero(medicoEntity.getEndereco().getNumero());
-
+			if(medicoEntity.getEndereco() != null) {
+				medicoDto.setEndereco(enderecoService.entityToDto(medicoEntity.getEndereco()));
 			}
-
-			List<EspecialidadeDto> especialidadesDto = new ArrayList<EspecialidadeDto>();
-
-			if (medicoEntity.getEspecialidades().size() > 0) {
-				for (MedicoEspecialidade medicoEspecialidade : medicoEntity.getEspecialidades()) {
-
-					EspecialidadeDto especialidadeDto = new EspecialidadeDto();
-					especialidadeDto.setId(medicoEspecialidade.getEspecialidade().getId());
-					especialidadeDto
-							.setNomeEspecialidade(medicoEspecialidade.getEspecialidade().getNomeEspecialidade());
-
-					especialidadesDto.add(especialidadeDto);
-
-				}
-			}
-
-			medicoDto.setEspecialidades(especialidadesDto);*/
 
 			return medicoDto;
 
@@ -253,8 +229,8 @@ public class MedicoServiceImpl implements MedicoService {
 
 		}
 		
-		if(medicoDto.getEnderecoDto() != null) {
-			medicoNovo.setEndereco(enderecoService.dtoToEntity(medicoDto.getEnderecoDto()));
+		if(medicoDto.getEndereco() != null) {
+			medicoNovo.setEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco()));
 		}
 		
 		return medicoNovo;

@@ -85,11 +85,11 @@ public class MedicoDto {
 		this.especialidades = especialidades;
 	}
 
-	public EnderecoDto getEnderecoDto() {
+	public EnderecoDto getEndereco() {
 		return endereco;
 	}
 
-	public void setEnderecoDto(EnderecoDto endereco) {
+	public void setEndereco(EnderecoDto endereco) {
 		this.endereco = endereco;
 	}
 	
