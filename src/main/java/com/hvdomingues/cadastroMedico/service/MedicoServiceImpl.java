@@ -25,8 +25,8 @@ public class MedicoServiceImpl implements MedicoService {
 	@Autowired
 	private MedicoRepository medicoRepository;
 
-	// @Autowired
-	// private EspecialidadeService especialidadeService;
+	@Autowired
+	private EspecialidadeService especialidadeService;
 
 	@Autowired
 	private EnderecoService enderecoService;
@@ -43,10 +43,14 @@ public class MedicoServiceImpl implements MedicoService {
 		novoMedico.setEndereco(enderecoService.saveEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco())));
 
 		medicoRepository.save(novoMedico);
-
+		
+		novoMedico.setEspecialidades(especialidadeService.saveMedicoEspecialidade(medicoDto.getEspecialidades(), novoMedico));
+		
 		medicoDto.setId(novoMedico.getId());
 
 		medicoDto.getEndereco().setId(novoMedico.getEndereco().getId());
+		
+		medicoDto.setEspecialidades(especialidadeService.entityToDto(novoMedico.getEspecialidades()));
 
 		enderecoService.attachMedico(novoMedico, novoMedico.getEndereco());
 
@@ -59,7 +63,7 @@ public class MedicoServiceImpl implements MedicoService {
 		Medico foundMedico = medicoRepository.findById(id).get();
 
 		if (foundMedico == null || foundMedico.getIsDeleted()) {
-			throw new NotFoundException("O id informado não corresponde a nenhum médico cadastrado.");
+			throw new NotFoundException("O médico com ID informado não foi encontrado na base de dados.");
 		}
 
 		MedicoDto medicoDto = entityToDto(foundMedico);
@@ -71,10 +75,11 @@ public class MedicoServiceImpl implements MedicoService {
 	public MedicoDto updateMedico(MedicoDto medicoDto) {
 
 		Medico foundMedico = medicoRepository.findById(medicoDto.getId()).get();
+		
 
 		Medico novoMedico = new Medico();
 
-		if (foundMedico != null) {
+		if (foundMedico != null && !foundMedico.getIsDeleted()) {
 
 			novoMedico = dtoToEntity(foundMedico, medicoDto);
 
@@ -102,6 +107,10 @@ public class MedicoServiceImpl implements MedicoService {
 	public Boolean deleteMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
+		
+		if(foundMedico.getIsDeleted()) {
+			throw new NotFoundException("O médico com ID informado não foi encontrado na base de dados.");
+		}
 
 		foundMedico.setIsDeleted(true);
 		foundMedico = medicoRepository.save(foundMedico);
@@ -174,6 +183,9 @@ public class MedicoServiceImpl implements MedicoService {
 			if (medicoEntity.getEndereco() != null) {
 				medicoDto.setEndereco(enderecoService.entityToDto(medicoEntity.getEndereco()));
 			}
+			if(medicoEntity.getEspecialidades() != null) {
+				medicoDto.setEspecialidades(especialidadeService.entityToDto(medicoEntity.getEspecialidades()));
+			}
 
 			return medicoDto;
 
@@ -183,8 +195,6 @@ public class MedicoServiceImpl implements MedicoService {
 
 	}
 
-	// Todo endereco
-	// Todo especialidade
 	private Medico dtoToEntity(Medico medicoNovo, MedicoDto medicoDto) {
 
 		if (medicoDto.getCelular() != null) {
@@ -279,6 +289,7 @@ public class MedicoServiceImpl implements MedicoService {
 			
 		}
 		
+		
 		if(medicoDto.getTelefone() != null && !medicoDto.getTelefone().isBlank()) {
 			medico.setTelefone(medicoDto.getTelefone());
 			isFilled = true;
@@ -292,6 +303,7 @@ public class MedicoServiceImpl implements MedicoService {
 		if(medicoDto.getCrm() != null && !medicoDto.getCrm().isBlank()) {
 			medico.setCrm(medicoDto.getCrm());
 		}
+
 		
 		if(isFilled) {
 			

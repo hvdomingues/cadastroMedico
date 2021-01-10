@@ -50,19 +50,19 @@ public class EnderecoServiceImpl implements EnderecoService {
 
 				novoEndereco.setEstado(enderecoDto.getEstado());
 
-				if (enderecoDto.getCidade() != null) {
+				if (!isStringNullOrBlank(enderecoDto.getCidade())) {
 
 					novoEndereco.setCidade(enderecoDto.getCidade());
 
-					if (enderecoDto.getBairro() != null) {
+					if (!isStringNullOrBlank(enderecoDto.getBairro())) {
 
 						novoEndereco.setBairro(enderecoDto.getBairro());
 
-						if (enderecoDto.getRua() != null) {
+						if (!isStringNullOrBlank(enderecoDto.getRua())) {
 
 							novoEndereco.setRua(enderecoDto.getRua());
 
-							if (enderecoDto.getNumero() != null) {
+							if (!isStringNullOrBlank(enderecoDto.getNumero())) {
 
 								novoEndereco.setNumero(enderecoDto.getNumero());
 

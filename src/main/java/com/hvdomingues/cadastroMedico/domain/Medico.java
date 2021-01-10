@@ -130,6 +130,7 @@ public class Medico implements Serializable {
 	public void setEspecialidades(List<MedicoEspecialidade> especialidades) {
 		this.especialidades = especialidades;
 	}
+	
 
 	@Override
 	public int hashCode() {
