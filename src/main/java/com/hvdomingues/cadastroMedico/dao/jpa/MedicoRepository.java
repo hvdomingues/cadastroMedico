@@ -1,23 +1,16 @@
 package com.hvdomingues.cadastroMedico.dao.jpa;
 
-import java.util.List;
-
 import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.hvdomingues.cadastroMedico.domain.Medico;
 
 public interface MedicoRepository extends PagingAndSortingRepository<Medico, Long> {
 	
+	Page<Medico> findByIsDeleted(Boolean isDeleted, Pageable pageable);
 	
-	List<Medico> findByCrm(String crm);
-	List<Medico> findByTelefone(String telefone);
-	List<Medico> findByCelular(String celular);
-	
-	List<Medico> findByNomeCompletoStartingWithIgnoreCase(String nomeCompleto);
-	
-	List<Medico> findByIsDeleted(Boolean isDeleted);
-	
-	Iterable<Medico> findAll(Example<Medico> medico);
+	Page<Medico> findAll(Example<Medico> medico, Pageable pageable);
 	
 }

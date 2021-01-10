@@ -1,7 +1,5 @@
 package com.hvdomingues.cadastroMedico.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.hvdomingues.cadastroMedico.dao.jpa.MedicoRepository;
@@ -16,7 +16,6 @@ import com.hvdomingues.cadastroMedico.domain.Endereco;
 import com.hvdomingues.cadastroMedico.domain.Medico;
 import com.hvdomingues.cadastroMedico.dto.EnderecoDto;
 import com.hvdomingues.cadastroMedico.dto.MedicoDto;
-import com.hvdomingues.cadastroMedico.exception.DatabaseException;
 import com.hvdomingues.cadastroMedico.exception.IllegalArgumentException;
 import com.hvdomingues.cadastroMedico.exception.NotFoundException;
 
@@ -26,9 +25,9 @@ public class MedicoServiceImpl implements MedicoService {
 	@Autowired
 	private MedicoRepository medicoRepository;
 
-	//@Autowired
-	//private EspecialidadeService especialidadeService;
-	
+	// @Autowired
+	// private EspecialidadeService especialidadeService;
+
 	@Autowired
 	private EnderecoService enderecoService;
 
@@ -40,15 +39,15 @@ public class MedicoServiceImpl implements MedicoService {
 		Medico novoMedico = new Medico();
 
 		novoMedico = dtoToEntity(novoMedico, medicoDto);
-		
+
 		novoMedico.setEndereco(enderecoService.saveEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco())));
 
 		medicoRepository.save(novoMedico);
 
 		medicoDto.setId(novoMedico.getId());
-		
+
 		medicoDto.getEndereco().setId(novoMedico.getEndereco().getId());
-				
+
 		enderecoService.attachMedico(novoMedico, novoMedico.getEndereco());
 
 		return medicoDto;
@@ -58,13 +57,12 @@ public class MedicoServiceImpl implements MedicoService {
 	public MedicoDto getMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
-		
-		if(foundMedico == null || foundMedico.getIsDeleted()) {
+
+		if (foundMedico == null || foundMedico.getIsDeleted()) {
 			throw new NotFoundException("O id informado não corresponde a nenhum médico cadastrado.");
 		}
 
 		MedicoDto medicoDto = entityToDto(foundMedico);
-		
 
 		return medicoDto;
 
@@ -79,22 +77,19 @@ public class MedicoServiceImpl implements MedicoService {
 		if (foundMedico != null) {
 
 			novoMedico = dtoToEntity(foundMedico, medicoDto);
-			
-			if(medicoDto.getEndereco() != null) {
-				
-				novoMedico.setEndereco(enderecoService.updateEndereco(foundMedico.getEndereco(), medicoDto.getEndereco()));
-				
-				
-			}else {
-				
+
+			if (medicoDto.getEndereco() != null) {
+
+				novoMedico.setEndereco(
+						enderecoService.updateEndereco(foundMedico.getEndereco(), medicoDto.getEndereco()));
+
+			} else {
+
 				novoMedico.setEndereco(foundMedico.getEndereco());
-				
+
 			}
-			
-			
+
 			return entityToDto(medicoRepository.save(novoMedico));
-			
-			
 
 		} else {
 
@@ -107,49 +102,27 @@ public class MedicoServiceImpl implements MedicoService {
 	public Boolean deleteMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
-		
+
 		foundMedico.setIsDeleted(true);
 		foundMedico = medicoRepository.save(foundMedico);
 
 		return foundMedico.getIsDeleted();
 	}
 
-	public List<MedicoDto> getAllMedicos() {
 
-		List<Medico> foundMedicos = medicoRepository.findByIsDeleted(false);
+	@Override
+	public Page<MedicoDto> getAllMedicos(Integer page, Integer size) {
 
-		List<MedicoDto> foundDtoMedicos = new ArrayList<MedicoDto>();
+		PageRequest pageRequest = PageRequest.of(
+                page,
+                size);
+		
+		Page<Medico> foundMedicos = medicoRepository.findByIsDeleted(false, pageRequest);
 
-		for (Medico medico : foundMedicos) {
+		Page<MedicoDto> foundMedicosDto = toPageObjectDto(foundMedicos);
 
-			foundDtoMedicos.add(entityToDto(medico));
+		return foundMedicosDto;
 
-		}
-
-		return foundDtoMedicos;
-
-	}
-
-	private List<Medico> removeDeleted(List<Medico> foundMedicos) {
-
-		List<Medico> activeMedicos = new ArrayList<>();
-
-		if (foundMedicos.size() == 0) {
-			throw new DatabaseException("Não foi encontrado nenhum médico com o critério informado.");
-		}
-
-		for (Medico medico : foundMedicos) {
-			if (!medico.getIsDeleted()) {
-				activeMedicos.add(medico);
-			}
-
-		}
-
-		if (activeMedicos.size() == 0) {
-			throw new DatabaseException("Não foi encontrado nenhum médico ativo com o critério informado.");
-		}
-
-		return activeMedicos;
 	}
 
 	private Boolean validaTelefone(String telefone) {
@@ -210,7 +183,6 @@ public class MedicoServiceImpl implements MedicoService {
 
 	}
 
-	
 	// Todo endereco
 	// Todo especialidade
 	private Medico dtoToEntity(Medico medicoNovo, MedicoDto medicoDto) {
@@ -252,15 +224,17 @@ public class MedicoServiceImpl implements MedicoService {
 			}
 
 		}
-		
 
-		
 		return medicoNovo;
 
 	}
 
 	@Override
-	public List<MedicoDto> findBy(MedicoDto medicoDto) {
+	public Page<MedicoDto> findBy(MedicoDto medicoDto, int page, int size) {
+		
+		PageRequest pageRequest = PageRequest.of(
+                page,
+                size);
 
 		Medico medico = new Medico();
 		Boolean isFilled = false;
@@ -320,15 +294,15 @@ public class MedicoServiceImpl implements MedicoService {
 		}
 		
 		if(isFilled) {
-			List<Medico> foundMedicos = (List<Medico>) medicoRepository.findAll(Example.of(medico, ExampleMatcher.matchingAll().withStringMatcher(StringMatcher.STARTING)
-					.withIgnoreCase()));
-			List<MedicoDto> foundMedicosDto = new ArrayList<MedicoDto>();
 			
-			if(foundMedicos.size() > 0) {
-				for (Medico medicoEntity : foundMedicos) {
-					foundMedicosDto.add(entityToDto(medicoEntity));
-				}
-				
+			Page<Medico> foundMedicos = medicoRepository.findAll(Example.of(medico, ExampleMatcher.matchingAll().withStringMatcher(StringMatcher.STARTING)
+					.withIgnoreCase()), pageRequest);
+			
+			Page<MedicoDto> foundMedicosDto = toPageObjectDto(foundMedicos);
+			
+			
+			
+			if(foundMedicos.getTotalElements() > 0) {
 				return foundMedicosDto;
 			}
 			else {
@@ -337,165 +311,14 @@ public class MedicoServiceImpl implements MedicoService {
 		}
 		else {
 			throw new IllegalArgumentException("Algum campo de pesquisa deve ser preenchido");
-		}
-		
-		
-		
+		}	
 		
 	}
+	
+	private Page<MedicoDto> toPageObjectDto(Page<Medico> medicos) {
+	    Page<MedicoDto> dtos  = medicos.map(this::entityToDto);
+	    return dtos;
+	}
 
-	/*
-	 * private Medico dtoToEntity(MedicoDto medicoDto) {
-	 * 
-	 * if (medicoDto != null) {
-	 * 
-	 * Medico novoMedico = new Medico();
-	 * 
-	 * novoMedico.setNomeCompleto(medicoDto.getNomeCompleto());
-	 * novoMedico.setCrm(medicoDto.getCrm());
-	 * novoMedico.setCelular(medicoDto.getCelular());
-	 * novoMedico.setTelefone(medicoDto.getTelefone());
-	 * 
-	 * Endereco novoEndereco = new Endereco();
-	 * 
-	 * novoEndereco.setCep(medicoDto.getCep());
-	 * novoEndereco.setEstado(medicoDto.getEstado());
-	 * novoEndereco.setCidade(medicoDto.getCidade());
-	 * novoEndereco.setBairro(medicoDto.getBairro());
-	 * novoEndereco.setRua(medicoDto.getRua());
-	 * novoEndereco.setNumero(medicoDto.getNumero());
-	 * novoEndereco.setMedico(novoMedico);
-	 * 
-	 * novoMedico.setEndereco(novoEndereco);
-	 * 
-	 * List<MedicoEspecialidade> especialidades = new
-	 * ArrayList<MedicoEspecialidade>();
-	 * 
-	 * if (medicoDto.getEspecialidades() != null) {
-	 * 
-	 * for (EspecialidadeDto item : medicoDto.getEspecialidades()) {
-	 * 
-	 * MedicoEspecialidade medicoEspecialidade = new MedicoEspecialidade();
-	 * 
-	 * medicoEspecialidade.setMedico(novoMedico);
-	 * 
-	 * medicoEspecialidade.setEspecialidade(especialidadeRepository.findById(item.
-	 * getId()).get());
-	 * 
-	 * especialidades.add(medicoEspecialidade);
-	 * 
-	 * } }
-	 * 
-	 * novoMedico.setEspecialidades(especialidades);
-	 * 
-	 * if (medicoDto.getId() != null) {
-	 * 
-	 * novoMedico.setId(medicoDto.getId());
-	 * 
-	 * }
-	 * 
-	 * return novoMedico;
-	 * 
-	 * }
-	 * 
-	 * return null; }
-	 * 
-	 * public List<Medico> getMedicosByCelular(String celular) {
-	 * 
-	 * List<Medico> foundMedicos = medicoRepository.findByCelular(celular);
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByTelefone(String telefone) {
-	 * 
-	 * List<Medico> foundMedicos = medicoRepository.findByTelefone(telefone);
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByCrm(String crm) {
-	 * 
-	 * List<Medico> foundMedicos = medicoRepository.findByCrm(crm);
-	 * 
-	 * return removeDeleted(foundMedicos);
-	 * 
-	 * }
-	 * 
-	 * public List<Medico> getMedicosByNomeCompleto(String nomeCompleto) {
-	 * 
-	 * List<Medico> foundMedicos =
-	 * medicoRepository.findByNomeCompletoStartingWithIgnoreCase(nomeCompleto);
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByCep(String cep) {
-	 * 
-	 * List<Endereco> foundEnderecos = enderecoService.getEnderecoByCep(cep);
-	 * 
-	 * List<Medico> foundMedicos = new ArrayList<>();
-	 * 
-	 * for (Endereco endereco : foundEnderecos) {
-	 * 
-	 * foundMedicos.add(endereco.getMedico());
-	 * 
-	 * }
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByBairro(String bairro) {
-	 * 
-	 * List<Endereco> foundEnderecos = enderecoService.getEnderecoByBairro(bairro);
-	 * 
-	 * List<Medico> foundMedicos = new ArrayList<>();
-	 * 
-	 * for (Endereco endereco : foundEnderecos) {
-	 * 
-	 * foundMedicos.add(endereco.getMedico());
-	 * 
-	 * }
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByEstado(String estado) {
-	 * 
-	 * List<Endereco> foundEnderecos = enderecoService.getEnderecoByEstado(estado);
-	 * 
-	 * List<Medico> foundMedicos = new ArrayList<>();
-	 * 
-	 * for (Endereco endereco : foundEnderecos) {
-	 * 
-	 * foundMedicos.add(endereco.getMedico());
-	 * 
-	 * }
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByCidade(String cidade) {
-	 * 
-	 * List<Endereco> foundEnderecos = enderecoService.getEnderecoByCidade(cidade);
-	 * 
-	 * List<Medico> foundMedicos = new ArrayList<>();
-	 * 
-	 * for (Endereco endereco : foundEnderecos) {
-	 * 
-	 * foundMedicos.add(endereco.getMedico());
-	 * 
-	 * }
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 * 
-	 * public List<Medico> getMedicosByRua(String rua) {
-	 * 
-	 * List<Endereco> foundEnderecos = enderecoService.getEnderecoByRua(rua);
-	 * 
-	 * List<Medico> foundMedicos = new ArrayList<>();
-	 * 
-	 * for (Endereco endereco : foundEnderecos) {
-	 * 
-	 * foundMedicos.add(endereco.getMedico());
-	 * 
-	 * }
-	 * 
-	 * return removeDeleted(foundMedicos); }
-	 */
 
 }

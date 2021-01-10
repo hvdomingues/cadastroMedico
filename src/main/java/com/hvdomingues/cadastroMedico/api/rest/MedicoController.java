@@ -1,12 +1,10 @@
 package com.hvdomingues.cadastroMedico.api.rest;
 
-
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,19 +32,20 @@ public class MedicoController {
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = { "application/json",
 			"application/xml" }, produces = { "application/json", "application/xml" })
 	public ResponseEntity<MedicoDto> createMedico(@RequestBody MedicoDto medico) {
-		
+
 		MedicoDto createdMedico = this.medicoService.createMedico(medico);
-		
+
 		return new ResponseEntity<MedicoDto>(createdMedico, HttpStatus.CREATED);
 	}
 
 	// Select all method
 	@GetMapping
-	public ResponseEntity<List<MedicoDto>> getAllMedicos() {
+	public ResponseEntity<Page<MedicoDto>> getAllMedicos(@RequestParam( value = "page", required = false, defaultValue = "0") int page,
+		    @RequestParam (value = "size", required = false, defaultValue = "10") int size) {
 
-		List<MedicoDto> medicos = medicoService.getAllMedicos();
+		Page<MedicoDto> medicos = medicoService.getAllMedicos(page, size);
 
-		return new ResponseEntity<List<MedicoDto>>(medicos, HttpStatus.CREATED);
+		return new ResponseEntity<Page<MedicoDto>>(medicos, HttpStatus.CREATED);
 
 	}
 
@@ -83,16 +82,17 @@ public class MedicoController {
 		return ResponseEntity.ok().body(resultado);
 
 	}
-	
+
 	@RequestMapping(value = "/findBy", method = RequestMethod.POST, consumes = { "application/json",
 	"application/xml" }, produces = { "application/json", "application/xml" })
-	public ResponseEntity<List<MedicoDto>> getMedicoBy(@RequestBody MedicoDto medicoDto)
+	public ResponseEntity<Page<MedicoDto>> getMedicoBy(@RequestBody MedicoDto medicoDto, @RequestParam( value = "page", required = false, defaultValue = "0") int page,
+		    @RequestParam (value = "size", required = false, defaultValue = "10") int size)
 	{
 		
-		List<MedicoDto> medicos = medicoService.findBy(medicoDto);
+		Page<MedicoDto> medicos = medicoService.findBy(medicoDto, page, size);
 		
 		
-		return new ResponseEntity<List<MedicoDto>>(medicos, HttpStatus.FOUND);
+		return new ResponseEntity<Page<MedicoDto>>(medicos, HttpStatus.FOUND);
 		
 		
 	}
