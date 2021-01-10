@@ -58,7 +58,7 @@ public class MedicoController {
 
 		MedicoDto updatedMedico = medicoService.updateMedico(medicoDto);
 
-		return ResponseEntity.ok().body(updatedMedico);
+		return new ResponseEntity<MedicoDto>(updatedMedico, HttpStatus.OK);
 
 	}
 
@@ -71,7 +71,7 @@ public class MedicoController {
 
 		Boolean isDeleted = medicoService.deleteMedicoById(medico.getId());
 
-		return ResponseEntity.ok().body(isDeleted);
+		return new ResponseEntity<Boolean>(isDeleted, HttpStatus.OK);
 
 	}
 

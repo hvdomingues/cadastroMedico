@@ -40,11 +40,15 @@ public class MedicoServiceImpl implements MedicoService {
 		Medico novoMedico = new Medico();
 
 		novoMedico = dtoToEntity(novoMedico, medicoDto);
+		
+		novoMedico.setEndereco(enderecoService.saveEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco())));
 
 		medicoRepository.save(novoMedico);
 
 		medicoDto.setId(novoMedico.getId());
 		
+		medicoDto.getEndereco().setId(novoMedico.getEndereco().getId());
+				
 		enderecoService.attachMedico(novoMedico, novoMedico.getEndereco());
 
 		return medicoDto;
@@ -54,8 +58,13 @@ public class MedicoServiceImpl implements MedicoService {
 	public MedicoDto getMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
+		
+		if(foundMedico == null || foundMedico.getIsDeleted()) {
+			throw new NotFoundException("O id informado não corresponde a nenhum médico cadastrado.");
+		}
 
 		MedicoDto medicoDto = entityToDto(foundMedico);
+		
 
 		return medicoDto;
 
@@ -71,8 +80,21 @@ public class MedicoServiceImpl implements MedicoService {
 
 			novoMedico = dtoToEntity(foundMedico, medicoDto);
 			
-
+			if(medicoDto.getEndereco() != null) {
+				
+				novoMedico.setEndereco(enderecoService.updateEndereco(foundMedico.getEndereco(), medicoDto.getEndereco()));
+				
+				
+			}else {
+				
+				novoMedico.setEndereco(foundMedico.getEndereco());
+				
+			}
+			
+			
 			return entityToDto(medicoRepository.save(novoMedico));
+			
+			
 
 		} else {
 
@@ -85,7 +107,7 @@ public class MedicoServiceImpl implements MedicoService {
 	public Boolean deleteMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
-		;
+		
 		foundMedico.setIsDeleted(true);
 		foundMedico = medicoRepository.save(foundMedico);
 
@@ -176,9 +198,7 @@ public class MedicoServiceImpl implements MedicoService {
 			if (medicoEntity.getCelular() != null) {
 				medicoDto.setCelular(medicoEntity.getCelular());
 			}
-			
-			
-			if(medicoEntity.getEndereco() != null) {
+			if (medicoEntity.getEndereco() != null) {
 				medicoDto.setEndereco(enderecoService.entityToDto(medicoEntity.getEndereco()));
 			}
 
@@ -233,9 +253,7 @@ public class MedicoServiceImpl implements MedicoService {
 
 		}
 		
-		if(medicoDto.getEndereco() != null) {
-			medicoNovo.setEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco()));
-		}
+
 		
 		return medicoNovo;
 
