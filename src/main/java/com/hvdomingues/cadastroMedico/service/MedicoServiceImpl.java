@@ -333,7 +333,7 @@ public class MedicoServiceImpl implements MedicoService {
 							}
 						}
 
-						if (igualdades <= 0) {
+						if (igualdades != medicoDto.getEspecialidades().size()) {
 							foundMedicosToCheck.get(i).setIsDeleted(true);
 							continue lab1;
 						}
