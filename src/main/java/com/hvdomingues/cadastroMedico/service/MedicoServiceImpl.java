@@ -1,5 +1,7 @@
 package com.hvdomingues.cadastroMedico.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +10,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import com.hvdomingues.cadastroMedico.dao.jpa.MedicoRepository;
 import com.hvdomingues.cadastroMedico.domain.Endereco;
 import com.hvdomingues.cadastroMedico.domain.Medico;
 import com.hvdomingues.cadastroMedico.dto.EnderecoDto;
+import com.hvdomingues.cadastroMedico.dto.EspecialidadeDto;
 import com.hvdomingues.cadastroMedico.dto.MedicoDto;
 import com.hvdomingues.cadastroMedico.exception.IllegalArgumentException;
 import com.hvdomingues.cadastroMedico.exception.NotFoundException;
@@ -43,13 +47,14 @@ public class MedicoServiceImpl implements MedicoService {
 		novoMedico.setEndereco(enderecoService.saveEndereco(enderecoService.dtoToEntity(medicoDto.getEndereco())));
 
 		medicoRepository.save(novoMedico);
-		
-		novoMedico.setEspecialidades(especialidadeService.saveMedicoEspecialidade(medicoDto.getEspecialidades(), novoMedico));
-		
+
+		novoMedico.setEspecialidades(
+				especialidadeService.saveMedicoEspecialidade(medicoDto.getEspecialidades(), novoMedico));
+
 		medicoDto.setId(novoMedico.getId());
 
 		medicoDto.getEndereco().setId(novoMedico.getEndereco().getId());
-		
+
 		medicoDto.setEspecialidades(especialidadeService.entityToDto(novoMedico.getEspecialidades()));
 
 		enderecoService.attachMedico(novoMedico, novoMedico.getEndereco());
@@ -75,7 +80,6 @@ public class MedicoServiceImpl implements MedicoService {
 	public MedicoDto updateMedico(MedicoDto medicoDto) {
 
 		Medico foundMedico = medicoRepository.findById(medicoDto.getId()).get();
-		
 
 		Medico novoMedico = new Medico();
 
@@ -107,8 +111,8 @@ public class MedicoServiceImpl implements MedicoService {
 	public Boolean deleteMedicoById(Long id) {
 
 		Medico foundMedico = medicoRepository.findById(id).get();
-		
-		if(foundMedico.getIsDeleted()) {
+
+		if (foundMedico.getIsDeleted()) {
 			throw new NotFoundException("O médico com ID informado não foi encontrado na base de dados.");
 		}
 
@@ -118,14 +122,11 @@ public class MedicoServiceImpl implements MedicoService {
 		return foundMedico.getIsDeleted();
 	}
 
-
 	@Override
 	public Page<MedicoDto> getAllMedicos(Integer page, Integer size) {
 
-		PageRequest pageRequest = PageRequest.of(
-                page,
-                size);
-		
+		PageRequest pageRequest = PageRequest.of(page, size);
+
 		Page<Medico> foundMedicos = medicoRepository.findByIsDeleted(false, pageRequest);
 
 		Page<MedicoDto> foundMedicosDto = toPageObjectDto(foundMedicos);
@@ -183,7 +184,7 @@ public class MedicoServiceImpl implements MedicoService {
 			if (medicoEntity.getEndereco() != null) {
 				medicoDto.setEndereco(enderecoService.entityToDto(medicoEntity.getEndereco()));
 			}
-			if(medicoEntity.getEspecialidades() != null) {
+			if (medicoEntity.getEspecialidades() != null) {
 				medicoDto.setEspecialidades(especialidadeService.entityToDto(medicoEntity.getEspecialidades()));
 			}
 
@@ -241,96 +242,147 @@ public class MedicoServiceImpl implements MedicoService {
 
 	@Override
 	public Page<MedicoDto> findBy(MedicoDto medicoDto, int page, int size) {
-		
-		PageRequest pageRequest = PageRequest.of(
-                page,
-                size);
+
+		PageRequest pageRequest = PageRequest.of(page, size);
 
 		Medico medico = new Medico();
 		Boolean isFilled = false;
-		
-		if(medicoDto.getNomeCompleto() != null && !medicoDto.getNomeCompleto().isBlank()) {
+
+		if (medicoDto.getNomeCompleto() != null && !medicoDto.getNomeCompleto().isBlank()) {
 			medico.setNomeCompleto(medicoDto.getNomeCompleto());
 			isFilled = true;
 		}
-		
-		if(medicoDto.getEndereco() != null) {
-			
+
+		if (medicoDto.getEndereco() != null) {
+
 			Endereco enderecoEntity = new Endereco();
 			EnderecoDto enderecoDto = medicoDto.getEndereco();
-			
-			
-			if(enderecoDto.getCep() != null && !enderecoDto.getCep().isBlank()) {
+
+			if (enderecoDto.getCep() != null && !enderecoDto.getCep().isBlank()) {
 				enderecoEntity.setCep(enderecoDto.getCep());
 				isFilled = true;
 			}
-			
-			if(enderecoDto.getEstado() != null && !enderecoDto.getEstado().isBlank()) {
+
+			if (enderecoDto.getEstado() != null && !enderecoDto.getEstado().isBlank()) {
 				enderecoEntity.setEstado(enderecoDto.getEstado());
 				isFilled = true;
 			}
-			
-			if(enderecoDto.getCidade() != null && !enderecoDto.getCidade().isBlank()) {
+
+			if (enderecoDto.getCidade() != null && !enderecoDto.getCidade().isBlank()) {
 				enderecoEntity.setCidade(enderecoDto.getCidade());
 				isFilled = true;
 			}
-			
-			if(enderecoDto.getBairro() != null && !enderecoDto.getBairro().isBlank()) {
+
+			if (enderecoDto.getBairro() != null && !enderecoDto.getBairro().isBlank()) {
 				enderecoEntity.setBairro(enderecoDto.getBairro());
 				isFilled = true;
 			}
-			if(enderecoDto.getRua() != null && !enderecoDto.getRua().isBlank()) {
+			if (enderecoDto.getRua() != null && !enderecoDto.getRua().isBlank()) {
 				enderecoEntity.setRua(enderecoDto.getRua());
 				isFilled = true;
 			}
-			
+
 			medico.setEndereco(enderecoEntity);
-			
-			
+
 		}
-		
-		
-		if(medicoDto.getTelefone() != null && !medicoDto.getTelefone().isBlank()) {
+
+		if (medicoDto.getTelefone() != null && !medicoDto.getTelefone().isBlank()) {
 			medico.setTelefone(medicoDto.getTelefone());
 			isFilled = true;
 		}
-		
-		if(medicoDto.getCelular() != null && !medicoDto.getCelular().isBlank()) {
+
+		if (medicoDto.getCelular() != null && !medicoDto.getCelular().isBlank()) {
 			medico.setCelular(medicoDto.getCelular());
 			isFilled = true;
 		}
-		
-		if(medicoDto.getCrm() != null && !medicoDto.getCrm().isBlank()) {
+
+		if (medicoDto.getCrm() != null && !medicoDto.getCrm().isBlank()) {
 			medico.setCrm(medicoDto.getCrm());
+			isFilled = true;
+		}
+		if (medicoDto.getEspecialidades().get(0).getId() != null) {
+			isFilled = true;
 		}
 
-		
-		if(isFilled) {
-			
-			Page<Medico> foundMedicos = medicoRepository.findAll(Example.of(medico, ExampleMatcher.matchingAll().withStringMatcher(StringMatcher.STARTING)
-					.withIgnoreCase()), pageRequest);
-			
+		if (isFilled) {
+
+			Page<Medico> foundMedicos = medicoRepository.findAll(
+					Example.of(medico,
+							ExampleMatcher.matchingAll().withStringMatcher(StringMatcher.STARTING).withIgnoreCase()),
+					pageRequest);
+
 			Page<MedicoDto> foundMedicosDto = toPageObjectDto(foundMedicos);
-			
-			
-			
-			if(foundMedicos.getTotalElements() > 0) {
-				return foundMedicosDto;
+
+			if (medicoDto.getEspecialidades().get(0) != null) {
+
+				List<MedicoDto> foundMedicosToCheck = foundMedicosDto.getContent();
+
+				lab1: for (int i = 0; i < foundMedicosToCheck.size(); i++) {
+
+					int igualdades = 0;
+
+					lab2: for (EspecialidadeDto medicoDtoEspecialidade : medicoDto.getEspecialidades()) {
+
+						for (EspecialidadeDto especialidadeDto : foundMedicosToCheck.get(i).getEspecialidades()) {
+
+							if (especialidadeDto.getId() == medicoDtoEspecialidade.getId()) {
+
+								igualdades += 1;
+								continue lab2;
+
+							}
+						}
+
+						if (igualdades <= 0) {
+							foundMedicosToCheck.get(i).setIsDeleted(true);
+							continue lab1;
+						}
+
+					}
+				}
+
+				List<MedicoDto> removedMedicos = removeDeleted(foundMedicosToCheck);
+
+				return new PageImpl<>(removedMedicos, PageRequest.of(page, size), removedMedicos.size());
+
 			}
-			else {
+
+			if (foundMedicos.getTotalElements() > 0) {
+				return foundMedicosDto;
+			} else {
 				throw new NotFoundException("Nenhum médico encontrado com os critérios dados.");
 			}
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Algum campo de pesquisa deve ser preenchido");
-		}	
-		
-	}
-	
-	private Page<MedicoDto> toPageObjectDto(Page<Medico> medicos) {
-	    Page<MedicoDto> dtos  = medicos.map(this::entityToDto);
-	    return dtos;
+		}
+
 	}
 
+	private Page<MedicoDto> toPageObjectDto(Page<Medico> medicos) {
+		Page<MedicoDto> dtos = medicos.map(this::entityToDto);
+		return dtos;
+	}
+
+	private List<MedicoDto> removeDeleted(List<MedicoDto> foundMedicos) {
+
+		List<MedicoDto> activeMedicos = new ArrayList<>();
+
+		if (foundMedicos.size() == 0) {
+			throw new NotFoundException("Não foi encontrado nenhum médico com o critério informado.");
+		}
+
+		for (MedicoDto medico : foundMedicos) {
+
+			if (!medico.getIsDeleted()) {
+				activeMedicos.add(medico);
+			}
+		}
+
+		if (activeMedicos.size() == 0) {
+			throw new NotFoundException("Não foi encontrado nenhum médico ativo com o critério informado.");
+		}
+
+		return activeMedicos;
+	}
 
 }

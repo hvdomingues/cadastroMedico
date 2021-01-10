@@ -2,6 +2,7 @@ package com.hvdomingues.cadastroMedico.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import com.hvdomingues.cadastroMedico.domain.Medico;
 import com.hvdomingues.cadastroMedico.domain.MedicoEspecialidade;
 import com.hvdomingues.cadastroMedico.dto.EspecialidadeDto;
 import com.hvdomingues.cadastroMedico.exception.IllegalArgumentException;
+import com.hvdomingues.cadastroMedico.exception.NotFoundException;
 
 @Service
 public class EspecialidadeServiceImpl implements EspecialidadeService {
@@ -71,5 +73,22 @@ public class EspecialidadeServiceImpl implements EspecialidadeService {
 			return (List<MedicoEspecialidade>) medicoEspecialidadeRepository.saveAll(medicoEspecialidadesSaved);
 		}
 	}
+
+
+	@Override
+	public Especialidade findById(Long id) {
+		
+		Optional<Especialidade> foundEspecialidade = especialidadeRepository.findById(id);
+		
+		if(foundEspecialidade.isPresent()) {
+			return foundEspecialidade.get();
+		}else {
+			throw new NotFoundException("Nenhuma especialidade com ID informado encontrada.");
+		}
+		
+		
+	}
+	
+	
 
 }

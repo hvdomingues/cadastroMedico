@@ -29,8 +29,11 @@ public class Especialidade implements Serializable{
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="especialidade")
 	private List<MedicoEspecialidade> especialidades;
 	
-	public Especialidade() {
-		
+	public Especialidade() {	
+	}
+	
+	public Especialidade(Long id) {
+		this.id = id;
 	}
 
 	public Especialidade(Long id, String nomeEspecialidade) {
