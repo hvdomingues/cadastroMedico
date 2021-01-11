@@ -4,6 +4,7 @@ import validate from "./validate-spected";
 import getValidationSchema from "./getValidationSchema-spected";
 import "./SignUpForm.css";
 import axios from "axios";
+import EnderecoService from "../../../enderecoService";
 
 const initialValues = {
   nomeCompleto: "",
@@ -58,8 +59,6 @@ const initialValues = {
   },
 };
 
-let valueIsSetted = false;
-
 const checkBoxValues = initialValues.especialidades;
 
 export default function SignUpFormContainer() {
@@ -74,13 +73,25 @@ export default function SignUpFormContainer() {
   );
 }
 
-function setIsChecked(e) {
+const handleChange2 = (event) => {
+  initialValues.cep = event.target.value;
+}
 
+function setIsChecked(e) {
   if (e.target.checked) {
     checkBoxValues[e.target.value - 1].isChecked = true;
   } else {
     checkBoxValues[e.target.value - 1] = false;
   }
+}
+
+async function carregarCep(){
+
+    let endereco = await EnderecoService(initialValues.cep);
+
+    console.log(endereco);
+
+    
 
 }
 
@@ -96,7 +107,6 @@ async function onSubmit(values, { setSubmitting, setErrors }) {
       especialidades.push(especialidade);
     }
   });
-
 
   values.especialidades = especialidades;
 
@@ -161,7 +171,6 @@ function SignUpForm(props) {
                 <li>
                   <input
                     name={especialidade.nomeEspecialidade}
-                    
                     type="checkbox"
                     onChange={setIsChecked}
                     value={especialidade.idEspecialidade}
@@ -172,12 +181,63 @@ function SignUpForm(props) {
             })}
           </ul>
         </label>
-      </div>
-      <div className="divDireita"></div>
 
-      <button className="btn btn-primary bt-validar" onClick={handleSubmit}>
-        {isSubmitting ? "Loading" : "Sign Up"}
-      </button>
+        <label className="form-field" htmlFor="cep">
+          <span>CEP:</span>
+          <input name="cep" type="text" onChange={handleChange2} />
+        </label>
+        <div className="form-field-error">{errors.cep}</div>
+
+        <button className="btn btn-primary" onClick={carregarCep}>Carregar endereço</button>
+
+        <label className="form-field" htmlFor="estado">
+          <span>Estado:</span>
+          <input
+            name="estado"
+            readonly="readonly"
+            type="text"
+            onChange={handleChange}
+            value={initialValues.endereco.estado}
+          />
+        </label>
+
+        <label className="form-field" htmlFor="cidade">
+          <span>Cidade:</span>
+          <input
+            name="cidade"
+            readonly="readonly"
+            type="text"
+            onChange={handleChange}
+          />
+        </label>
+
+        <label className="form-field" htmlFor="bairro">
+          <span>Bairro:</span>
+          {<input
+            value={initialValues.endereco.bairro}
+          />}
+        </label>
+
+        <label className="form-field" htmlFor="rua">
+          <span>Rua</span>
+          <input
+            name="rua"
+            readonly="readonly"
+            type="text"
+            onChange={handleChange}
+          />
+        </label>
+
+        <label className="form-field" htmlFor="numero">
+          <span>Numero:</span>
+          <input name="numero" type="text" onChange={handleChange} />
+        </label>
+        <div className="form-field-error">{errors.numero}</div>
+
+        <button className="btn btn-primary bt-validar" onClick={handleSubmit}>
+          {isSubmitting ? "Loading" : "Cadastrar"}
+        </button>
+      </div>
     </div>
   );
 }
