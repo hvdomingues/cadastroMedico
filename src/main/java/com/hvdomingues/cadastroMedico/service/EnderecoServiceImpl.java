@@ -41,54 +41,60 @@ public class EnderecoServiceImpl implements EnderecoService {
 	public Endereco dtoToEntity(EnderecoDto enderecoDto) {
 
 		Endereco novoEndereco = new Endereco();
+		
+		if(enderecoDto != null) {
+			if (enderecoDto.getCep() != null && enderecoDto.getCep().length() == 8) {
 
-		if (enderecoDto.getCep() != null && enderecoDto.getCep().length() == 8) {
+				novoEndereco.setCep(enderecoDto.getCep());
 
-			novoEndereco.setCep(enderecoDto.getCep());
+				if (enderecoDto.getEstado() != null && enderecoDto.getEstado().length() == 2) {
 
-			if (enderecoDto.getEstado() != null && enderecoDto.getEstado().length() == 2) {
+					novoEndereco.setEstado(enderecoDto.getEstado());
 
-				novoEndereco.setEstado(enderecoDto.getEstado());
+					if (!isStringNullOrBlank(enderecoDto.getCidade())) {
 
-				if (!isStringNullOrBlank(enderecoDto.getCidade())) {
+						novoEndereco.setCidade(enderecoDto.getCidade());
 
-					novoEndereco.setCidade(enderecoDto.getCidade());
+						if (!isStringNullOrBlank(enderecoDto.getBairro())) {
 
-					if (!isStringNullOrBlank(enderecoDto.getBairro())) {
+							novoEndereco.setBairro(enderecoDto.getBairro());
 
-						novoEndereco.setBairro(enderecoDto.getBairro());
+							if (!isStringNullOrBlank(enderecoDto.getRua())) {
 
-						if (!isStringNullOrBlank(enderecoDto.getRua())) {
+								novoEndereco.setRua(enderecoDto.getRua());
 
-							novoEndereco.setRua(enderecoDto.getRua());
+								if (!isStringNullOrBlank(enderecoDto.getNumero())) {
 
-							if (!isStringNullOrBlank(enderecoDto.getNumero())) {
+									novoEndereco.setNumero(enderecoDto.getNumero());
 
-								novoEndereco.setNumero(enderecoDto.getNumero());
+								} else {
+									throw new IllegalArgumentException("O número deve estar preenchido.");
+								}
 
 							} else {
-								throw new IllegalArgumentException("O número deve estar preenchido.");
+								throw new IllegalArgumentException("A rua deve estar preenchida.");
 							}
 
 						} else {
-							throw new IllegalArgumentException("A rua deve estar preenchida.");
+							throw new IllegalArgumentException("O Bairro deve estar preenchido.");
 						}
 
 					} else {
-						throw new IllegalArgumentException("O Bairro deve estar preenchido.");
+						throw new IllegalArgumentException("A cidade deve estar preenchida.");
 					}
 
 				} else {
-					throw new IllegalArgumentException("A cidade deve estar preenchida.");
+					throw new IllegalArgumentException("O Estado deve estar preenchido e com o máximo de dois caracteres");
 				}
 
 			} else {
-				throw new IllegalArgumentException("O Estado deve estar preenchido e com o máximo de dois caracteres");
+				throw new IllegalArgumentException("O CEP deve ter exatos oito digítos númericos apenas.");
 			}
-
-		} else {
-			throw new IllegalArgumentException("O CEP deve ter exatos oito digítos númericos apenas.");
+		}else {
+			throw new IllegalArgumentException("Endereço inválido");
 		}
+		
+		
 
 		return novoEndereco;
 
