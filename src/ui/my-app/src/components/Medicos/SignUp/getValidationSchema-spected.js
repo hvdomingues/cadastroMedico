@@ -20,7 +20,7 @@ export default function getSpectedValidationSchema(values) {
     ],
     crm: [
       [(value) => !isEmpty(value), "O CRM deve ser preenchido."],
-      [(value) => value.length == 7, "O crm deve conter 7 caraceteres, verifique-o.",
+      [(value) => value.length === 7, "O crm deve conter 7 caraceteres, verifique-o.",
       ],
     ],
     cep: [
@@ -31,7 +31,7 @@ export default function getSpectedValidationSchema(values) {
       [
         (value) => !isEmpty(value), "O numero do endereço é necessário para o cadastro."
       ],
-    ]
+    ],
   };
 }
 
